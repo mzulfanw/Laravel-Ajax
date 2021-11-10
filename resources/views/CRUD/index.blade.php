@@ -19,8 +19,29 @@
     <div class="container my-5 ">
         <!-- Button trigger modal -->
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            Launch demo modal
+            Add Data
         </button>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Nama</th>
+                        <th scope="col">email</th>
+                        <th scope="col">password</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>@mdo</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
 
         <!-- Modal -->
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
@@ -35,15 +56,17 @@
                         <form>
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">name</label>
-                                <input type="text" class="form-control" id="name" aria-describedby="emailHelp">
+                                <input type="text" class="form-control" name="name" id="name"
+                                    aria-describedby="emailHelp">
                             </div>
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Email address</label>
-                                <input type="email" class="form-control" id="email" aria-describedby="emailHelp">
+                                <input type="email" class="form-control" name="" id="email"
+                                    aria-describedby="emailHelp">
                             </div>
                             <div class="mb-3">
                                 <label for="exampleInputPassword1" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password">
+                                <input type="password" class="form-control" name="" id="password">
                             </div>
 
                             <button type="submit" class="btn btn-primary" id="submitBtn">Submit</button>
@@ -70,9 +93,10 @@
 
             $('#submitBtn').on('click', function(e) {
                 e.preventDefault();
-                const name = $('#name').val();
-                const email = $('#email').val();
-                const password = $('#password').val();
+                let name = $('#name').val();
+                let email = $('#email').val();
+                let password = $('#password').val();
+                let token = $("meta[name='csrf-token']").attr("content");
 
                 if (name.length == "" && email.length == "" && password.length == "") {
                     Swal.fire({
@@ -98,6 +122,51 @@
                         title: 'Oops...',
                         text: 'Password',
                     });
+                } else {
+                    $.ajax({
+                        url: "{{ route('index.store') }}",
+                        dataType: "JSON",
+                        type: "POST",
+                        cache: false,
+                        data: {
+                            "name": name,
+                            "email": email,
+                            "password": password,
+                            "_token": token
+                        },
+                        success: function(response) {
+                            if (response.success) {
+
+                                Swal.fire({
+                                        type: 'success',
+                                        title: 'Login Berhasil!',
+                                        text: 'Anda akan di arahkan dalam 3 Detik',
+                                        timer: 3000,
+                                        showCancelButton: false,
+                                        showConfirmButton: false
+                                    })
+                                    .then(function() {
+                                        window.location = '/crud/index';
+                                    });
+
+                            } else {
+
+                                console.log(response.success);
+
+                                Swal.fire({
+                                    type: 'error',
+                                    title: 'Login Gagal!',
+                                    text: 'silahkan coba lagi!'
+                                });
+
+                            }
+
+                            console.log(response);
+                        },
+                        error: function(response) {
+                            console.log(response);
+                        }
+                    })
                 }
 
 

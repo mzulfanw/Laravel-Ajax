@@ -21,4 +21,5 @@ Route::get('/', function () {
 
 Route::prefix('crud')->group(function () {
     Route::get('/index', [UsersController::class, 'index']);
+    Route::post('/index/store', [UsersController::class, 'store'])->name('index.store');
 });

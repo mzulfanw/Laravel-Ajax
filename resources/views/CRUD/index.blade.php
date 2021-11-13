@@ -21,26 +21,35 @@
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
             Add Data
         </button>
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Nama</th>
-                        <th scope="col">email</th>
-                        <th scope="col">password</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                    </tr>
-
-                </tbody>
-            </table>
+        <div class="container mt-5">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Nama</th>
+                            <th scope="col">email</th>
+                            <th scope="col">password</th>
+                            <th scope="col">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($users as $index => $user)
+                            <tr>
+                                <th>{{ $index + 1 }}</th>
+                                <td>{{ $user->name }}</td>
+                                <td>{{ $user->email }}</td>
+                                <td>{{ $user->password }}</td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm btnDelete" data-id="{{ $user->id }}">
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Modal -->
@@ -50,7 +59,8 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form>
@@ -139,8 +149,8 @@
 
                                 Swal.fire({
                                         type: 'success',
-                                        title: 'Login Berhasil!',
-                                        text: 'Anda akan di arahkan dalam 3 Detik',
+                                        title: 'Berhasil ',
+                                        text: 'Berhasil menambahkan data ke database',
                                         timer: 3000,
                                         showCancelButton: false,
                                         showConfirmButton: false
@@ -155,7 +165,7 @@
 
                                 Swal.fire({
                                     type: 'error',
-                                    title: 'Login Gagal!',
+                                    title: 'Error',
                                     text: 'silahkan coba lagi!'
                                 });
 
@@ -168,6 +178,52 @@
                         }
                     })
                 }
+
+
+            });
+
+            $('.btnDelete').on('click', function(e) {
+                e.preventDefault();
+                // Dapetin ID dari atribut data-id
+                let id = $(this).data("id");
+                console.log(id)
+
+                // Mulai hapus data dengan ajax
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `{{ url('crud/index/delete/${id}') }}`,
+                            type: "DELETE",
+                            dataType: "JSON",
+                            data: {
+                                "_token": "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+
+                                Swal.fire(
+                                    'Deleted!',
+                                    'Your file has been deleted.',
+                                    'success'
+                                )
+                            }
+                        });
+
+                    }
+                }).then(() => {
+                    setTimeout(() => {
+                        window.location = '/crud/index';
+                    }, 3000);
+
+                })
+
 
 
             });

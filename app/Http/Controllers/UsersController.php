@@ -7,10 +7,16 @@ use Illuminate\Http\Request;
 
 class UsersController extends Controller
 {
+
+    // Method untuk menampilkan data dari database menggunakan Eloquent
+
     public function index()
     {
-        return view('CRUD.index');
+        $users = User::all();
+        return view('CRUD.index', compact('users'));
     }
+
+    // Method untuk store data atau insert data
 
     public function store(Request $request)
     {
@@ -22,5 +28,19 @@ class UsersController extends Controller
         return response()->json([
             'success' => true
         ], 200);
+    }
+
+
+
+    // Method untuk hapus data yang diparsing dari parameter
+    public function destroy($id)
+    {
+        $users = User::findOrFail($id);
+        // dd($users);
+        $users->delete();
+
+        return response()->json(
+            ['success' => true]
+        );
     }
 }

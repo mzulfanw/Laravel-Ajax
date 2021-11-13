@@ -31,6 +31,19 @@ class UsersController extends Controller
     }
 
 
+    // Method Update Data
+    public function update(Request $request)
+    {
+        $users = User::find($request->id);
+
+
+        $users->name = $request->name;
+        $users->email = $request->email;
+        $users->password = bcrypt($request->password);
+
+        $users->save();
+    }
+
 
     // Method untuk hapus data yang diparsing dari parameter
     public function destroy($id)

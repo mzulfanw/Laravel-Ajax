@@ -23,4 +23,5 @@ Route::prefix('crud')->group(function () {
     Route::get('/index', [UsersController::class, 'index']);
     Route::post('/index/store', [UsersController::class, 'store'])->name('index.store');
     Route::delete('/index/delete/{id}', [UsersController::class, 'destroy'])->name('index.destroy');
+    Route::put('/index/update', [UsersController::class, 'update']);
 });

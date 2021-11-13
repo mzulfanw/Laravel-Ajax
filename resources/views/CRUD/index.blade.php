@@ -26,7 +26,7 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th scope="col">#</th>
+                            <th scope="col">id</th>
                             <th scope="col">Nama</th>
                             <th scope="col">email</th>
                             <th scope="col">password</th>
@@ -34,9 +34,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($users as $index => $user)
+                        @foreach ($users as $user)
                             <tr>
-                                <th>{{ $index + 1 }}</th>
+                                <td>{{ $user->id }}</td>
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->password }}</td>
@@ -44,6 +44,7 @@
                                     <button class="btn btn-danger btn-sm btnDelete" data-id="{{ $user->id }}">
                                         Delete
                                     </button>
+                                    <button class="btn btn-info btn-sm btnUpdate">Update</button>
                                 </td>
                             </tr>
                         @endforeach
@@ -86,6 +87,43 @@
                 </div>
             </div>
         </div>
+
+
+        {{-- Uptade Modal --}}
+        <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Update Modal</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editForm">
+                            <input type="text" name="id" id="id">
+                            <div class="mb-3">
+                                <label for="exampleInputEmail1" class="form-label">name</label>
+                                <input type="text" class="form-control" name="name" id="Uname"
+                                    aria-describedby="emailHelp">
+                            </div>
+                            <div class="mb-3">
+                                <label for="exampleInputEmail1" class="form-label">Email address</label>
+                                <input type="email" class="form-control" name="email" id="Uemail"
+                                    aria-describedby="emailHelp">
+                            </div>
+                            <div class="mb-3">
+                                <label for="exampleInputPassword1" class="form-label">Password</label>
+                                <input type="password" class="form-control" name="password" id="Upassword">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" id="updateBtn">Submit</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Optional JavaScript; choose one of the two! -->
@@ -100,6 +138,7 @@
     <script>
         $(document).ready(function() {
 
+            // Submit Data
 
             $('#submitBtn').on('click', function(e) {
                 e.preventDefault();
@@ -146,7 +185,6 @@
                         },
                         success: function(response) {
                             if (response.success) {
-
                                 Swal.fire({
                                         type: 'success',
                                         title: 'Berhasil ',
@@ -158,19 +196,14 @@
                                     .then(function() {
                                         window.location = '/crud/index';
                                     });
-
                             } else {
-
                                 console.log(response.success);
-
                                 Swal.fire({
                                     type: 'error',
                                     title: 'Error',
                                     text: 'silahkan coba lagi!'
                                 });
-
                             }
-
                             console.log(response);
                         },
                         error: function(response) {
@@ -178,16 +211,16 @@
                         }
                     })
                 }
-
-
             });
+
+            // Delete Data
 
             $('.btnDelete').on('click', function(e) {
                 e.preventDefault();
                 // Dapetin ID dari atribut data-id
                 let id = $(this).data("id");
-                console.log(id)
 
+                console.log(id)
                 // Mulai hapus data dengan ajax
                 Swal.fire({
                     title: 'Are you sure?',
@@ -207,7 +240,6 @@
                                 "_token": "{{ csrf_token() }}"
                             },
                             success: function(response) {
-
                                 Swal.fire(
                                     'Deleted!',
                                     'Your file has been deleted.',
@@ -215,7 +247,6 @@
                                 )
                             }
                         });
-
                     }
                 }).then(() => {
                     setTimeout(() => {
@@ -223,10 +254,51 @@
                     }, 3000);
 
                 })
+            });
+
+            // Update Data
+
+            $('.btnUpdate').on('click', function(e) {
+
+                $tr = $(this).closest('tr');
+                let data = $tr.children("td").map(function() {
+                    return $(this).text()
+                }).get();
 
 
+                // Trigger Modalnya
+                $('#updateModal').modal("show");
+                let id = $('#id').val(data[0])
+                let name = $('#Uname').val(data[1]);
+                let email = $('#Uemail').val(data[2]);
+                let password = $('#Upassword').val(data[3]);
+                // console.log(id)
+            });
+
+            // Submit datanya
+
+            $('#editForm').on('submit', function(e) {
+                e.preventDefault()
+
+                $.ajax({
+                    data: $('#editForm').serialize(),
+                    dataType: "JSON",
+                    type: "PUT",
+                    url: `{{ url('crud/index/update') }}`,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(res) {
+                        console.log(res)
+                    },
+                    error: function(res) {
+                        console.log(res)
+                    }
+                })
 
             });
+
+
         });
     </script>
 
